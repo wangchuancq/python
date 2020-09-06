@@ -1,0 +1,26 @@
+def 查找四五星级混合型股票型基金():
+	获取所有基金代码()
+	获取晨星评级()
+	a=open('所有基金代码.txt','r')
+	jjdm=a.read()
+	a.close()
+	a=open('四五星级基金信息.txt','r')
+	jjxx=a.read()
+	a.close()
+	jjdm=jjdm.splitlines()
+	jjxx=jjxx.splitlines()
+	s=''
+	js=0
+	for i1 in jjxx:
+		j=i1.split(' ')
+		dm=j[0]
+		for i2 in jjdm:
+			if ('混合型' in i2 or '股票型' in i2) and dm in i2:
+				lx=i2.split(' ')[2]+'\n'
+				s=s+i1+' '+lx
+				js=js+1
+				break
+	a=open('四五星级混合型股票型基金.txt','w')
+	a.write(s)
+	a.close()
+	print('四五星级混合型股票型基金查找完毕！一共有',js,'支')
