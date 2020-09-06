@@ -1,0 +1,20 @@
+def 获取所有基金代码():
+	import requests,execjs
+	wangzhi='http://fund.eastmoney.com/js/fundcode_search.js'
+	llq=requests.get(wangzhi)	
+	a=llq.text.replace('var r = ','')
+	a=a.replace(';','')
+	a=execjs.eval(a)
+	b=''
+	js=0
+	for i in a:
+		jjdm=i[0]+' '#基金代码
+		jjmc=i[2]+' '#基金名称
+		jjlx=i[3]+'\n'#基金类型
+		jjxx=jjdm+jjmc+jjlx#基金信息
+		b=b+jjxx
+		js=js+1
+	wj=open('所有基金代码.txt','w')
+	wj.write(b)
+	wj.close()
+	print('所有基金代码获取完毕！一共有',js,'支')
