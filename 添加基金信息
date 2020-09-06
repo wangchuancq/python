@@ -1,0 +1,72 @@
+def 添加基金信息():
+	#想要的基金信息有基金代码，基金名称，基金星级，基金类型，基金收益率，基金风险系数，基金波动幅度，基金夏普指数，基金经理，基金份额，基金持仓
+	获取基金经理信息()
+	a=open('所有基金经理信息.txt','r')
+	b=a.read()
+	a.close()
+	查找四五星级混合型股票型基金()
+	a=open('四五星级混合型股票型基金.txt','r')
+	c=a.read()
+	a.close()
+	b=b.splitlines()
+	c=c.splitlines()
+	s=''
+	js=0
+	for i1 in c:
+		dm=i1.split(' ')[0]
+		for i2 in b:
+			ls=i2.split(' ')
+			if dm in ls[4]:
+				jjjl=ls[1]+' '#基金经理
+				jjgs=ls[3]+' '#基金公司
+				jjges=str(len(ls[4].split(',')))+' '#管理的基金个数
+				zyts=ls[6]+' '#执业天数
+				glje=ls[10]+'\n'#管理金额
+				s=s+i1+' '+jjjl+jjgs+jjges+zyts+glje
+				js=js+1
+	a=open('自选好基金.txt','w')
+	a.write(s)
+	a.close()
+	print('添加基金经理信息完毕,一共有',js,'支基金的信息呢。')
+
+	获取基金净值总金额()
+	a=open('基金份额统计表.txt','r')
+	b=a.read()
+	a.close()
+	a=open('自选好基金.txt','r')
+	c=a.read()
+	a.close()
+	b=b.splitlines()
+	c=c.splitlines()
+	s='基金代码 基金名称 评级日期 三年期评级 五年期评级 晨星回报日期 一周回报率 一月回报率 三月回报率 六月回报率 一年回报率 两年回报率 '
+	s=s+'今年回报率 设立以来回报率 风险指标计算截止日 波动幅度 评价 风险系数 评价 近三年夏普 评价 基金类型 基金经理 基金公司 管理的基金支数 '
+	s=s+'执业天数 管理资金总额 股票占比 债券占比 货币占比 总净值\n'
+	js=0
+	for i in c:
+		dm=i.split(' ')[0]
+		for j in b:
+			ls=j.split(' ')
+			if ls[0]==dm:
+				gp=ls[2]+' '#股票
+				zq=ls[3]+' '#债券
+				hb=ls[4]+' '#货币
+				jz=ls[5]+'\n'#总净值
+				s=s+i+' '+gp+zq+hb+jz
+				js=js+1
+				break
+	a=open('自选好基金.txt','w')
+	a.write(s)
+	a.close()
+	print('又完成了基金股票、债券、货币的占比和基金总金额的统计，一共有',js,'支基金的信息呢。')
+	import xlwt
+	wb=xlwt.Workbook(encoding='utf-8')
+	ws=wb.add_sheet('选出的基金')
+	s=s.splitlines()	
+	表长=len(s)
+	for i in range(表长):
+		ls=s[i].split(' ')
+		for j in range(len(ls)):
+			ws.write(i,j,ls[j])
+	wb.save('选出的好基金.xls')
+
+	return s
