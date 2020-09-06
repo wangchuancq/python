@@ -1,0 +1,254 @@
+def 挑选好基金():
+	#a=添加基金信息()
+	a=open('自选好基金.txt','r')
+	b=a.read()
+	a.close()
+	a=b.splitlines()
+	sj=[]
+	for i in a:
+		k=i.split(' ')
+		sj.append(k)
+
+	
+		
+
+
+	def 剔除执业天数太小的基金(sj):
+		年数=3*365		
+		sj=sorted(sj,key=lambda x:x[-6])
+		sj=sorted(sj,key=lambda x:x[0])
+		sj[0],sj[-1]=sj[-1],sj[0]
+		js=0
+		lssj=[]
+		for i in range(1,len(sj)):
+			if int(sj[i][-6])>年数:				
+				lssj.append(sj[i])
+				js=js+1
+		lssj.append(sj[0])
+		lssj[0],lssj[-1]=lssj[-1],lssj[0]		
+		print('剔除掉执业天数小于',年数,'天的基金经理后，只留下',js,'支基金')		
+		return lssj
+
+	def 剔除总金额太大的基金(sj):
+		金额=100#亿元
+		sj=sorted(sj,key=lambda x:x[-1])
+		sj[0],sj[-1]=sj[-1],sj[0]
+		lssj=[]
+		js=0
+		for i in range(1,len(sj)):
+			if float(sj[i][-1])<金额:
+				lssj.append(sj[i])
+				js=js+1
+		lssj.append(sj[0])
+		lssj[0],lssj[-1]=lssj[-1],lssj[0]	
+		print('剔除基金规模大于',金额,'亿元的基金后，还有',js,'支基金')
+		return lssj
+
+	def 剔除股票占比太小的基金(sj):
+		占比=70
+		lssj=[]
+		js=0
+		for i in range(1,len(sj)):
+			if float(sj[i][-4])>占比:
+				lssj.append(sj[i])
+				js=js+1
+		lssj.append(sj[0])
+		lssj[0],lssj[-1]=lssj[-1],lssj[0]	
+		print('剔除股票占比小于',占比,'%的基金后，还有',js,'支基金')		
+		return lssj
+	def 剔除最近一年收益率太低的基金(sj):
+		一年收益率=40
+		lssj=[]
+		js=0
+		for i in range(1,len(sj)):
+			if float(sj[i][10])>一年收益率:
+				lssj.append(sj[i])
+				js=js+1
+		lssj.append(sj[0])
+		lssj[0],lssj[-1]=lssj[-1],lssj[0]	
+		print('剔除一年收益率小于',一年收益率,'%的基金后，还有',js,'支基金')		
+		return lssj
+	def 剔除最近两年收益率太低的基金(sj):
+		两年收益率=40
+		lssj=[]
+		js=0
+		for i in range(1,len(sj)):
+			if float(sj[i][10])>两年收益率:
+				lssj.append(sj[i])
+				js=js+1
+		lssj.append(sj[0])
+		lssj[0],lssj[-1]=lssj[-1],lssj[0]	
+		print('剔除两年收益率小于',两年收益率,'%的基金后，还有',js,'支基金')		
+		return lssj
+	def 剔除最近三年夏普比率太低的基金(sj):
+		三年夏普比率=1
+		lssj=[]
+		js=0
+		for i in range(1,len(sj)):
+			if float(sj[i][10])>三年夏普比率:
+				lssj.append(sj[i])
+				js=js+1
+		lssj.append(sj[0])
+		lssj[0],lssj[-1]=lssj[-1],lssj[0]	
+		print('剔除三年夏普比率小于',三年夏普比率,'的基金后，还有',js,'支基金')		
+		return lssj
+	def 剔除最近三年星级太低的基金(sj):
+		三年星级='★★★★★'
+		lssj=[]
+		js=0
+		for i in range(1,len(sj)):
+			if sj[i][3]!=三年星级:
+				lssj.append(sj[i])
+				js=js+1
+		lssj.append(sj[0])
+		lssj[0],lssj[-1]=lssj[-1],lssj[0]	
+		print('剔除三年星级小于',三年星级,'的基金后，还有',js,'支基金')		
+		return lssj
+	def 剔除最近五年星级太低的基金(sj):
+		五年星级='★★★★★'
+		lssj=[]
+		js=0
+		for i in range(1,len(sj)):
+			if sj[i][4]!=五年星级:
+				lssj.append(sj[i])
+				js=js+1
+		lssj.append(sj[0])
+		lssj[0],lssj[-1]=lssj[-1],lssj[0]	
+		print('剔除五年星级小于',五年星级,'的基金后，还有',js,'支基金')				
+		return lssj
+	def 获取基金持仓(基金代码):#返回的数据格式[[基金代码],[[股票代码,净值比例],[股票代码,净值比例]]],一共三层
+		import requests,re
+		jjdm=str(基金代码)#007750
+		wangzhi1='http://fundf10.eastmoney.com/FundArchivesDatas.aspx?type=jjcc&code='
+		wangzhi3='&topline=10&year=&month=&rt=0.3298419498031713'
+		wangzhi=wangzhi1+jjdm+wangzhi3
+		llq=requests.get(wangzhi)
+		a=[]
+		b=[jjdm]
+		a.append(b)
+		if "</td></tr></tbody></table><div class='hide'" not in llq.text and '</th></tr></thead>' not in llq.text:
+			return []
+		nr=llq.text.split("</td></tr></tbody></table><div class='hide'")[0].split('</th></tr></thead>')[1]
+		nr=nr.split('</td></tr>')
+		c=[]
+		for i in nr:
+			ls=[]
+			j=i.split("</td><td class='tor'>")
+			if len(j)<4:
+				return []
+			gp=j[0].split("html'>")[1].split('</a></td><td')#股票
+			gpdm=gp[0]#股票代码
+			if '%' not in j[3]:			
+				return []		
+			jzbl=float(j[3].split('%')[0])#净值比例
+			ls.append(gpdm)		
+			ls.append(jzbl)
+			c.append(ls)
+		a.append(c)
+
+		#print(a)
+		return a
+	def 汇总基金持仓(基金代码表):
+		s=[]#基金代码
+		for i in 基金代码表:
+			if len(i[0])==6:
+				s.append(i[0])
+
+		s1=[]#基金持仓表
+		for i in s:
+			a=获取基金持仓(i)
+			s1.append(a)
+		s2=[]#股票表
+		for i in s1:
+			for j in i[1]:
+				s2.append(j[0])
+		s2=list(set(s2))		
+		print('这',len(s1),'支基金一共持有了',len(s2),'支股票')
+		# gpc=dict.fromkeys(s2,0)
+		
+		# for i in s1:
+		# 	for j in i[1]:
+		# 		gpc[j[0]]=gpc[j[0]]+j[1]
+		print(s)
+		return s
+
+	def 基金调仓对比(sj):
+		import os,datetime
+		#搞出文件名称备用
+		rq=datetime.date.today()
+		nian=rq.year
+		a=datetime.date(nian-1,9,30)
+		b=datetime.date(nian-1,12,30)
+		chun=datetime.date(nian,3,30)
+		xia=datetime.date(nian,6,30)
+		qiu=datetime.date(nian,9,30)
+		dong=datetime.date(nian,12,30)
+		rqb=[a,b,chun,xia,qiu,dong]
+		for i in range(1,len(rqb)):
+			if rqb[i-1]<rq<=rqb[i]:
+				xrq=rqb[i-1]#新日期
+				lrq=rqb[i-2]#老日期
+				lbt=str(rqb[i-2])+'调仓记录.txt'
+				xbt=str(rqb[i-1])+'调仓记录.txt'
+				
+
+		#读取老基金代码
+		a=os.listdir()
+		if lbt in a:
+			a=open(lbt,'r')
+			b=a.read()
+			a.close()
+			b=b.splitlines()
+		ljj=[]#老基金代码
+		for i in b:
+			ljj.append(i.split(' ')[0])
+		#对比新老基金代码差异
+		出仓基金=[]
+		for i in ljj:
+			if i not in sj:
+				出仓基金.append(i)
+				
+		进仓基金=[]
+		for i in sj:
+			if i not in ljj:
+				进仓基金.append(i)
+				
+		s=''
+		for i in range(len(sj)):
+			s=s+sj[i]
+			if i<len(出仓基金):
+				s=s+' '+出仓基金[i]
+			if i<len(进仓基金):
+				s=s+' '+进仓基金[i]
+			s=s+'\n'
+		s='基金池  出仓基金 进仓基金\n'+s
+		print(s)
+		a=open(xbt,'w')
+		a.write(s)
+		a.close()
+
+
+
+
+
+					
+		
+
+		
+
+
+
+
+
+
+
+	a=剔除执业天数太小的基金(sj)
+	b=剔除总金额太大的基金(a)
+	c=剔除股票占比太小的基金(b)
+	d=剔除最近一年收益率太低的基金(c)
+	e=剔除最近两年收益率太低的基金(d)
+	f=剔除最近三年夏普比率太低的基金(e)
+	g=剔除最近三年星级太低的基金(f)
+	h=剔除最近五年星级太低的基金(g)
+	i=汇总基金持仓(h)
+	j=基金调仓对比(i)
