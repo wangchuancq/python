@@ -1,0 +1,60 @@
+def 获取基金的行业配置比例():
+	import requests,execjs
+	时间=获取年度季度()
+	hyzl='http://fund.eastmoney.com/data/FundDataPortfolio_Interface.aspx?dt=0&t='+时间+'&mc=returnJson&st=asc&sc=industrycode'#基金行业配置总量比例
+	llq=requests.get(hyzl)
+	a=llq.text
+	a=a.replace('var returnJson = ','')
+	a=a.replace(';','')
+	a=execjs.eval(a)
+	s='代码 行业 基金支数 总金额 资金占比\n'
+	for i in a['data']:
+		s1=''
+		for j in i:
+			s1=s1+j+' '
+		s1=s1+'\n'
+		s1=s1.replace(' \n','\n')
+		s=s+s1
+	print(s)
+	a=open('基金行业配置总量比例.txt','w')
+	a.write(s)
+	a.close()
+	print('基金行业配置总量比例获取完毕')
+	
+	行业代码=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
+	行业表=['农、林、牧、渔业','采矿业','制造业','电力、热力、燃气及水生产和供应业','建筑业','批发和零售业','交通运输、仓储和邮政业','住宿和餐饮业','信息传输、软件和信息技术服务业','金融业','房地产业','租赁和商务服务业','科学研究和技术服务业','水利、环境和公共设施管理业','居民服务、修理和其他服务业','教育','卫生和社会工作','文化、体育和娱乐业','综合']
+	
+	for i in range(len(行业代码)):#len(行业代码)
+		s=[]
+		行业名称=行业表[i]
+		页码='1'
+		wangzhi='http://fund.eastmoney.com/data/FundDataPortfolio_Interface.aspx?dt=1&t='+时间+'&hydm='+行业代码[i]+'&pi='+页码+'&pn=500&mc=returnJson&st=desc&sc=ZJZBL'
+		llq=requests.get(wangzhi)
+		a=llq.text
+		a=a.replace('var returnJson = ','')
+		a=a.replace(';','')
+		a=execjs.eval(a)
+		s=s+a['data']
+		总页码=int(a['pages'])
+		总支数=a['record']
+		for j in range(2,总页码+1):
+			页码=str(j)
+			wangzhi='http://fund.eastmoney.com/data/FundDataPortfolio_Interface.aspx?dt=1&t='+时间+'&hydm='+行业代码[i]+'&pi='+页码+'&pn=500&mc=returnJson&st=desc&sc=ZJZBL'
+			llq=requests.get(wangzhi)
+			a=llq.text
+			a=a.replace('var returnJson = ','')
+			a=a.replace(';','')
+			a=execjs.eval(a)
+			s=s+a['data']
+		s1='基金代码 基金名称 配置总金额 资金占比\n'
+		for i in s:			
+			jjdm=i[0]+' '
+			jjmc=i[1]+' '
+			jjje=i[2]+' '
+			zjzb=i[3]+'\n'
+			s2=jjdm+jjmc+jjje+zjzb
+			s1=s1+s2
+		a=open(行业名称+'基金配置.txt','w')
+		a.write(s1)
+		a.close()
+		print(行业名称,'基金配置获取完毕，请等待获取下一个行业……')
