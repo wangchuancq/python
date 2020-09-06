@@ -1,0 +1,32 @@
+def 获取基金经理信息():
+	import requests,execjs
+	wangzhi1='http://fund.eastmoney.com/Data/FundDataPortfolio_Interface.aspx?dt=14&mc=returnjson&ft=all&pn=500&pi='
+	wangzhi3='&sc=jjgspy&st=desc'
+	#pn=每页的数据条数，默认是50；pi是当前页码，sc是按照什么关键词查询，jjgspy是基金公司拼音，st是按顺序还是逆序查询，desc是逆序。
+
+	llq=requests.get(wangzhi1+'1'+wangzhi3)
+	nr=llq.text
+	nr=nr.replace('var returnjson= ','')
+	nr=execjs.eval(nr)
+	sj=nr['data']
+	最大页码=nr['pages']
+	for i in range(2,最大页码+1):
+		llq=requests.get(wangzhi1+str(i)+wangzhi3)
+		nr=llq.text
+		nr=nr.replace('var returnjson= ','')
+		nr=execjs.eval(nr)
+		sj=sj+nr['data']
+	s='基金经理代码 基金经理 基金公司代码 基金公司 管理的基金代码 管理的基金名称 执业天数 最优秀基金业绩 最优秀基金代码 最优秀基金名称 管理资金总额 最优秀基金业绩\n'
+	js=0
+	for i in sj:
+		s1=''
+		for j in i:
+			s1=s1+j+' '
+		s1=s1+'\n'
+		s1=s1.replace(' \n','\n')
+		s=s+s1
+		js=js+1
+	wj=open('所有基金经理信息.txt','w')
+	wj.write(s)
+	wj.close()
+	print('基金经理信息获取完毕！一共有',js,'个基金经理信息')
