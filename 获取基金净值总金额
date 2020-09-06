@@ -1,0 +1,40 @@
+def 获取基金净值总金额():
+	import requests,execjs,datetime
+	
+	wangzhi1='http://fund.eastmoney.com/data/FundDataPortfolio_Interface.aspx?dt=4&t='	
+	时间=获取年度季度()
+	wangzhi2='&pi='
+	页码='1'
+	wangzhi3='&pn=500&mc=returnJson&st=asc&sc=bzdm'
+	wangzhi=wangzhi1+时间+wangzhi2+页码+wangzhi3	
+
+	llq=requests.get(wangzhi)	
+	a=llq.text
+	a=a.replace('var returnJson=','')
+	a=a.replace(';','')
+	a=execjs.eval(a)
+	xx=a['data']
+	总页码=int(a['pages'])
+	for i in range(2,总页码+1):
+		页码=str(i)
+		wangzhi=wangzhi1+时间+wangzhi2+页码+wangzhi3
+		llq=requests.get(wangzhi)
+		a=llq.text
+		a=a.replace('var returnJson=','')
+		a=a.replace(';','')
+		a=execjs.eval(a)
+		xx=xx+a['data']
+	s=''
+	js=0
+	for i in xx:
+		s1=''
+		for j in i:
+			s1=s1+j+' '
+		s1=s1+'\n'
+		s1=s1.replace(' \n','\n')
+		s=s+s1
+		js=js+1
+	a=open('基金份额统计表.txt','w')
+	a.write(s)
+	a.close()
+	print('基金份额以及股票、债券、货币占比比例统计完毕，一共有',js,'支基金的信息')
