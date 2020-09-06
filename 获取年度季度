@@ -1,0 +1,11 @@
+def 获取年度季度():
+	import requests,execjs
+	a='http://fund.eastmoney.com/data/FundDataPortfolio_Interface.aspx?dt=13&pi=1&pn=50&mc=quarterlist&collname=HypzStatistics'
+	llq=requests.get(a)
+	b=llq.text
+	b=b.replace('var quarterlist=','')
+	b=b.replace(';','')
+	b=execjs.eval(b)
+	sj=b['data']
+	#print(sj[0])
+	return sj[0]
