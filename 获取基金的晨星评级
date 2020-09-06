@@ -1,0 +1,37 @@
+def 获取晨星评级():
+	import requests,xlwt,os,datetime
+	wangzhi='http://www.icbc.com.cn/ICBCDynamicSite/site/Fund/FundCXRankDetail.aspx'
+	llq=requests.get(wangzhi)
+	nr=llq.text.split('lbDraw')[1].split('</table>')[0]
+	nr=nr.split('<tr style="word-break:keep-all;white-space:nowrap; height:10px;"')
+
+	sj=[]
+	表头=['基金代码','基金名称','评级日期','三年期评级','五年期评级','晨星回报日期','一周回报率','一月回报率','三月回报率','六月回报率','一年回报率','两年回报率','今年回报率','设立以来回报率','风险指标计算截止日','波动幅度','评价','风险系数','评价','近三年夏普','评价']
+	sj.append(表头)
+	for i in nr:
+		lssj=[]
+		if len(i)>10:
+			ls=i.split('<td')
+			for j in range(1,len(ls)):
+				if j!=2:
+					lssj.append(ls[j].split('</td>')[0].split('>')[1])
+				else:
+					lssj.append(ls[2].split('return false">')[1].split('</a></td>')[0])
+			if ('★★★★★' in lssj[3] or '★★★★' in lssj[3]) and ('★★★★★' in lssj[4] or '★★★★' in lssj[4]):
+				sj.append(lssj)
+	
+	a='基金代码 基金名称 评级日期 三年期评级 五年期评级 晨星回报日期 一周回报率 一月回报率 三月回报率 六月回报率 一年回报率 两年回报率 今年回报率 设立以来回报率 风险指标计算截止日 波动幅度 评价 风险系数 评价 近三年夏普 评价'
+	js=0
+	for i in sj:
+		b=''
+		for j in i:
+			b=b+j+' '
+		b=b+'\n'
+		b=b.replace(' \n','\n')
+		a=a+b
+		js=js+1
+	wj=open('四五星级基金信息.txt','w')
+	wj.write(a)
+	wj.close()
+
+	print('晨星评级数据获取完毕！一共有',js,'支四星五星级的基金。')
